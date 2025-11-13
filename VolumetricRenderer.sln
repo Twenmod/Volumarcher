@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RendererApplication", ".\RendererApplication\VolumetricRenderer.vcxproj", "{9A570804-A401-4DF2-BF6B-A7446C567D39}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4} = {1A434F43-22E0-4550-88EB-384F2F60AAE4}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", ".\MiniEngine\Core\Core.vcxproj", "{86A58508-0D6A-4786-A32F-01A301FDC6F3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Volumarcher", ".\Volumarcher\Volumarcher.vcxproj", "{1A434F43-22E0-4550-88EB-384F2F60AAE4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3} = {86A58508-0D6A-4786-A32F-01A301FDC6F3}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Windows = Debug|Windows
+		Profile|Windows = Profile|Windows
+		Release|Windows = Release|Windows
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A570804-A401-4DF2-BF6B-A7446C567D39}.Debug|Windows.ActiveCfg = Debug|x64
+		{9A570804-A401-4DF2-BF6B-A7446C567D39}.Debug|Windows.Build.0 = Debug|x64
+		{9A570804-A401-4DF2-BF6B-A7446C567D39}.Profile|Windows.ActiveCfg = Profile|x64
+		{9A570804-A401-4DF2-BF6B-A7446C567D39}.Profile|Windows.Build.0 = Profile|x64
+		{9A570804-A401-4DF2-BF6B-A7446C567D39}.Release|Windows.ActiveCfg = Release|x64
+		{9A570804-A401-4DF2-BF6B-A7446C567D39}.Release|Windows.Build.0 = Release|x64
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3}.Debug|Windows.ActiveCfg = Debug|x64
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3}.Debug|Windows.Build.0 = Debug|x64
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3}.Profile|Windows.ActiveCfg = Profile|x64
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3}.Profile|Windows.Build.0 = Profile|x64
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3}.Release|Windows.ActiveCfg = Release|x64
+		{86A58508-0D6A-4786-A32F-01A301FDC6F3}.Release|Windows.Build.0 = Release|x64
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4}.Debug|Windows.ActiveCfg = Debug|x64
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4}.Debug|Windows.Build.0 = Debug|x64
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4}.Profile|Windows.ActiveCfg = Profile|x64
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4}.Profile|Windows.Build.0 = Profile|x64
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4}.Release|Windows.ActiveCfg = Release|x64
+		{1A434F43-22E0-4550-88EB-384F2F60AAE4}.Release|Windows.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {13A914B4-3775-448E-89A7-176037598B85}
+	EndGlobalSection
+EndGlobal
