@@ -151,8 +151,7 @@ namespace
         s_DXKeyMapping[GameInput::kKey_f8] = 66;
         s_DXKeyMapping[GameInput::kKey_f9] = 67;
         s_DXKeyMapping[GameInput::kKey_f10] = 68;
-        s_DXKeyMapping[GameInput::kKey_num
-        ] = 69;
+        s_DXKeyMapping[GameInput::kKey_numlock] = 69;
         s_DXKeyMapping[GameInput::kKey_scroll] = 70;
         s_DXKeyMapping[GameInput::kKey_numpad7] = 71;
         s_DXKeyMapping[GameInput::kKey_numpad8] = 72;

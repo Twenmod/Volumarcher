@@ -1,8 +1,10 @@
+#include "shaderCommon.h"
+
 RWTexture2D<float4> outputTexture : register(u0);
 
 cbuffer RootConstants : register(b0)
 {
-    float3 camPosition;
+    VolumetricConstants constants;
 };
 static const int STEP_COUNT = 512;
 static const float FAR_PLANE = 10;
@@ -29,8 +31,13 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float rayX = (2 * screenUV.x - 1)* fovAdjust * aspect;
     float rayY = (1-2 * screenUV.y) * fovAdjust;
 
-    float3 rayDir = normalize(float3(rayX, rayY, 1));
-    float3 rayOrigin = camPosition;
+    float3 camRight = cross(constants.camDir, float3(0, 1, 0));
+    float3 camUp = cross(camRight, constants.camDir);
+    float3x3 camMat = float3x3(camRight, camUp, constants.camDir);
+
+    float3 rayDir = mul(normalize(float3(rayX, rayY, 1)),camMat);
+
+    float3 rayOrigin = constants.camPos;
 
     static const float3 SPHERE_COLOR = float3(1,0,1);
     static const float3 BACKGROUND_COLOR = float3(0, 0, 0);

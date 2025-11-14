@@ -5,6 +5,7 @@
 #include "../MiniEngine/Core/PipelineState.h"
 #include "../MiniEngine/Core/BufferManager.h"
 
+#include "../shaders/shaderCommon.h"
 
 namespace Volumarcher
 {
@@ -22,7 +23,7 @@ namespace Volumarcher
 		m_computePSO.Finalize();
 	}
 
-	void VolumetricContext::Render(ColorBuffer _outputBuffer, glm::vec3 _camPos) const
+	void VolumetricContext::Render(ColorBuffer _outputBuffer, glm::vec3 _camPos, glm::quat _camRot) const
 	{
 		ComputeContext& computeContext = ComputeContext::Begin(L"Volumetric Pass");
 		computeContext.SetPipelineState(m_computePSO);
@@ -31,7 +32,11 @@ namespace Volumarcher
 		computeContext.TransitionResource(_outputBuffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, false);
 		computeContext.SetDynamicDescriptor(0, 0, _outputBuffer.GetUAV());
 		//Bind variables
-		computeContext.SetConstants(1, _camPos.x, _camPos.y, _camPos.z);
+
+		glm::vec3 camDir = _camRot * glm::vec3(0, 0, 1);
+		VolumetricConstants constants{_camPos, 0, camDir};
+
+		computeContext.SetConstantArray(1, sizeof(constants) / sizeof(float), &constants);
 
 		computeContext.Dispatch(1920 / 32, 1080 / 32, 1);
 		computeContext.Finish();

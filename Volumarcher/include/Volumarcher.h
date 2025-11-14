@@ -4,6 +4,7 @@
 #include "../MiniEngine/Core/BufferManager.h"
 
 #include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 namespace Volumarcher
 {
@@ -12,7 +13,9 @@ namespace Volumarcher
 	public:
 		VolumetricContext();
 
-		void Render(ColorBuffer _outputBuffer, glm::vec3 _camPos = glm::vec3{0.f}) const;
+		void Render(ColorBuffer _outputBuffer, glm::vec3 _camPos = glm::vec3{0.f},
+		            glm::quat _camRot = glm::identity<glm::quat>()) const;
+
 	private:
 		ComputePSO m_computePSO;
 		RootSignature m_rs;

@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Volumarcher.h" />
+    <ClInclude Include="shaders\shaderCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Volumarcher.cpp" />
@@ -69,6 +70,15 @@
     <Manifest>
       <EnableDPIAwareness>true</EnableDPIAwareness>
     </Manifest>
+    <FxCompile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">__HLSL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </FxCompile>
+    <FxCompile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">__HLSL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </FxCompile>
+    <FxCompile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">__HLSL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </FxCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
