@@ -1,7 +1,11 @@
 RWTexture2D<float4> outputTexture : register(u0);
 
-static const int STEP_COUNT = 128;
-static const float FAR_PLANE = 5;
+cbuffer RootConstants : register(b0)
+{
+    float3 camPosition;
+};
+static const int STEP_COUNT = 512;
+static const float FAR_PLANE = 10;
 
 
 static const int2 screenResolution = int2(1920, 1080);
@@ -10,11 +14,11 @@ static const float DEG_TO_RAD = 0.01745;
 
 static const float vFov = 90*DEG_TO_RAD;
 
-[numthreads(1, 1, 1)]
+[numthreads(32, 32, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     static const float3 spherePos = float3(0, 0, 3);
-    static const float sphereRad = 2.f;
+    static const float sphereRad2 = 4.f;
 
 
     //outputTexture[DTid.xy] = float4(int2(DTid.xy) / float2(1920.f, 1080.f),0,1);
@@ -26,22 +30,25 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float rayY = (1-2 * screenUV.y) * fovAdjust;
 
     float3 rayDir = normalize(float3(rayX, rayY, 1));
-    float3 rayOrigin = float3(0,0,0);
+    float3 rayOrigin = camPosition;
 
-    float3 color = float3(0,0,0);
+    static const float3 SPHERE_COLOR = float3(1,0,1);
+    static const float3 BACKGROUND_COLOR = float3(0, 0, 0);
 
     static float stepSize = FAR_PLANE/STEP_COUNT;
+    float transmittance = 1.0;
     for (int i = 0; i < STEP_COUNT; ++i)
     {
         float3 sample = rayOrigin + rayDir * (i * stepSize);
-        //color += length(sample - spherePos);
-        if (length(sample - spherePos) < sphereRad) // Hit sphere
+        float3 sphereOffset = sample - spherePos;
+        if (dot(sphereOffset,sphereOffset) < sphereRad2) // Hit sphere
         {
-            color += float3(0.2,0.2,0.2);
+            transmittance -= 0.06*stepSize;
         }
 
     }
-    outputTexture[DTid.xy] = float4(color, 1);
+    transmittance = saturate(transmittance);
+    outputTexture[DTid.xy] = float4(lerp(SPHERE_COLOR, BACKGROUND_COLOR, transmittance), 1);
 
 
 }
