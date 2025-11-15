@@ -16,22 +16,22 @@ CloudNoise::CloudNoise(const glm::ivec3 _resolution) : VolumeNoise()
 std::vector<float> CloudNoise::GenerateNoiseData(const glm::ivec3 _resolution)
 {
 	std::vector<float> data;
-	data.reserve(_resolution.x * _resolution.y * _resolution.z);
+	int dataSize = _resolution.x * _resolution.y * _resolution.z;
+	data.resize(dataSize);
 	noise::module::Billow billowNoise;
 	billowNoise.SetFrequency(3.17);
-	for (int z = 0; z < _resolution.z; ++z)
-	{
-		float sZ = z / static_cast<float>(_resolution.z);
-		for (int y = 0; y < _resolution.y; ++y)
-		{
-			float sY = y / static_cast<float>(_resolution.y);
-			for (int x = 0; x < _resolution.x; ++x)
-			{
-				float sX = x / static_cast<float>(_resolution.x);
 
-				data.push_back(abs(billowNoise.GetValue(sX, sY, sZ)));
-			}
-		}
+	for (int i = 0; i < dataSize; ++i)
+	{
+		int z = i / (_resolution.x * _resolution.y);
+		int y = (i / _resolution.x) % _resolution.y;
+		int x = i % _resolution.x;
+
+		float sX = x / static_cast<float>(_resolution.x);
+		float sY = y / static_cast<float>(_resolution.y);
+		float sZ = z / static_cast<float>(_resolution.z);
+
+		data[i] = abs(billowNoise.GetValue(sX, sY, sZ));
 	}
 
 	return data;
