@@ -73,7 +73,7 @@ void RendererApplication::Update(const float _deltaTime)
 	if (GameInput::IsPressed(GameInput::kKey_w)) input.z += 1;
 	if (GameInput::IsPressed(GameInput::kKey_s)) input.z -= 1;
 	if (GameInput::IsPressed(GameInput::kKey_space)) input.y += 1;
-	if (GameInput::IsPressed(GameInput::kKey_lcontrol)) input.y -= 1;
+	if (GameInput::IsPressed(GameInput::kKey_c)) input.y -= 1;
 	if (glm::dot(input, input) > 0) input = normalize(input);
 	m_camPos += (m_camRot * input) * m_cameraSpeed * _deltaTime;
 }

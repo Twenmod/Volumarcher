@@ -10,9 +10,99 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Volumarcher.h" />
-    <ClInclude Include="shaders\shaderCommon.h" />
+    <ClInclude Include="shaders\ShaderCommon.h" />
+    <ClInclude Include="include\CloudNoise.h" />
+    <ClInclude Include="include\VolumeNoise.h" />
+    <ClInclude Include="source\external\libnoise\model\line.h" />
+    <ClInclude Include="source\external\libnoise\model\model.h" />
+    <ClInclude Include="source\external\libnoise\model\plane.h" />
+    <ClInclude Include="source\external\libnoise\model\sphere.h" />
+    <ClInclude Include="source\external\libnoise\module\add.h" />
+    <ClInclude Include="source\external\libnoise\module\billow.h" />
+    <ClInclude Include="source\external\libnoise\module\blend.h" />
+    <ClInclude Include="source\external\libnoise\module\cache.h" />
+    <ClInclude Include="source\external\libnoise\module\checkerboard.h" />
+    <ClInclude Include="source\external\libnoise\module\clamp.h" />
+    <ClInclude Include="source\external\libnoise\module\const.h" />
+    <ClInclude Include="source\external\libnoise\module\curve.h" />
+    <ClInclude Include="source\external\libnoise\module\cylinders.h" />
+    <ClInclude Include="source\external\libnoise\module\displace.h" />
+    <ClInclude Include="source\external\libnoise\module\exponent.h" />
+    <ClInclude Include="source\external\libnoise\module\invert.h" />
+    <ClInclude Include="source\external\libnoise\module\max.h" />
+    <ClInclude Include="source\external\libnoise\module\min.h" />
+    <ClInclude Include="source\external\libnoise\module\module.h" />
+    <ClInclude Include="source\external\libnoise\module\modulebase.h" />
+    <ClInclude Include="source\external\libnoise\module\multiply.h" />
+    <ClInclude Include="source\external\libnoise\module\perlin.h" />
+    <ClInclude Include="source\external\libnoise\module\power.h" />
+    <ClInclude Include="source\external\libnoise\module\ridgedmulti.h" />
+    <ClInclude Include="source\external\libnoise\module\rotatepoint.h" />
+    <ClInclude Include="source\external\libnoise\module\scalebias.h" />
+    <ClInclude Include="source\external\libnoise\module\scalepoint.h" />
+    <ClInclude Include="source\external\libnoise\module\select.h" />
+    <ClInclude Include="source\external\libnoise\module\spheres.h" />
+    <ClInclude Include="source\external\libnoise\module\terrace.h" />
+    <ClInclude Include="source\external\libnoise\module\translatepoint.h" />
+    <ClInclude Include="source\external\libnoise\module\turbulence.h" />
+    <ClInclude Include="source\external\libnoise\module\voronoi.h" />
+    <ClInclude Include="source\external\libnoise\exception.h" />
+    <ClInclude Include="source\external\libnoise\interp.h" />
+    <ClInclude Include="source\external\libnoise\latlon.h" />
+    <ClInclude Include="source\external\libnoise\mathconsts.h" />
+    <ClInclude Include="source\external\libnoise\misc.h" />
+    <ClInclude Include="source\external\libnoise\noise.h" />
+    <ClInclude Include="source\external\libnoise\noisegen.h" />
+    <ClInclude Include="source\external\libnoise\vectortable.h" />
+    <ClInclude Include="source\external\libnoise\model\cylinder.h" />
+    <ClInclude Include="source\external\libnoise\module\abs.h" />
+    <ClInclude Include="source\external\libnoise\win32\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Volumarcher.cpp" />
+    <ClCompile Include="source\CloudNoise.cpp" />
+    <ClCompile Include="source\VolumeNoise.cpp" />
+    <ClCompile Include="source\external\libnoise\model\line.cpp" />
+    <ClCompile Include="source\external\libnoise\model\plane.cpp" />
+    <ClCompile Include="source\external\libnoise\model\sphere.cpp" />
+    <ClCompile Include="source\external\libnoise\module\add.cpp" />
+    <ClCompile Include="source\external\libnoise\module\billow.cpp" />
+    <ClCompile Include="source\external\libnoise\module\blend.cpp" />
+    <ClCompile Include="source\external\libnoise\module\cache.cpp" />
+    <ClCompile Include="source\external\libnoise\module\checkerboard.cpp" />
+    <ClCompile Include="source\external\libnoise\module\clamp.cpp" />
+    <ClCompile Include="source\external\libnoise\module\const.cpp" />
+    <ClCompile Include="source\external\libnoise\module\curve.cpp" />
+    <ClCompile Include="source\external\libnoise\module\cylinders.cpp" />
+    <ClCompile Include="source\external\libnoise\module\displace.cpp" />
+    <ClCompile Include="source\external\libnoise\module\exponent.cpp" />
+    <ClCompile Include="source\external\libnoise\module\invert.cpp" />
+    <ClCompile Include="source\external\libnoise\module\max.cpp" />
+    <ClCompile Include="source\external\libnoise\module\min.cpp" />
+    <ClCompile Include="source\external\libnoise\module\modulebase.cpp" />
+    <ClCompile Include="source\external\libnoise\module\multiply.cpp" />
+    <ClCompile Include="source\external\libnoise\module\perlin.cpp" />
+    <ClCompile Include="source\external\libnoise\module\power.cpp" />
+    <ClCompile Include="source\external\libnoise\module\ridgedmulti.cpp" />
+    <ClCompile Include="source\external\libnoise\module\rotatepoint.cpp" />
+    <ClCompile Include="source\external\libnoise\module\scalebias.cpp" />
+    <ClCompile Include="source\external\libnoise\module\scalepoint.cpp" />
+    <ClCompile Include="source\external\libnoise\module\select.cpp" />
+    <ClCompile Include="source\external\libnoise\module\spheres.cpp" />
+    <ClCompile Include="source\external\libnoise\module\terrace.cpp" />
+    <ClCompile Include="source\external\libnoise\module\translatepoint.cpp" />
+    <ClCompile Include="source\external\libnoise\module\turbulence.cpp" />
+    <ClCompile Include="source\external\libnoise\module\voronoi.cpp" />
+    <ClCompile Include="source\external\libnoise\latlon.cpp" />
+    <ClCompile Include="source\external\libnoise\noisegen.cpp" />
+    <ClCompile Include="source\external\libnoise\model\cylinder.cpp" />
+    <ClCompile Include="source\external\libnoise\module\abs.cpp" />
+    <ClCompile Include="source\external\libnoise\win32\dllmain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\external\libnoise\win32\libnoise.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\external\libnoise\win32\noise.rc" />
   </ItemGroup>
 </Project>
