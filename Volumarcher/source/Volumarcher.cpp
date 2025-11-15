@@ -16,7 +16,7 @@ namespace Volumarcher
 	{
 		m_rs.Reset(2, 0); // 1 parameter, 0 static samplers
 		m_rs[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
-		m_rs[1].InitAsConstants(0, sizeof(glm::vec3) / sizeof(float));
+		m_rs[1].InitAsConstants(0, sizeof(VolumetricConstants) / sizeof(uint32_t));
 		m_rs.Finalize(L"RootSig");
 		m_computePSO.SetRootSignature(m_rs);
 		m_computePSO.SetComputeShader(g_pVolumetricsCS, sizeof(g_pVolumetricsCS));
@@ -33,12 +33,15 @@ namespace Volumarcher
 		computeContext.SetDynamicDescriptor(0, 0, _outputBuffer.GetUAV());
 		//Bind variables
 
+		auto screenX = _outputBuffer.GetWidth();
+		auto screenY = _outputBuffer.GetHeight();
+
 		glm::vec3 camDir = _camRot * glm::vec3(0, 0, 1);
-		VolumetricConstants constants{_camPos, 0, camDir};
+		VolumetricConstants constants{_camPos, screenX, camDir, screenY};
 
-		computeContext.SetConstantArray(1, sizeof(constants) / sizeof(float), &constants);
+		computeContext.SetConstantArray(1, sizeof(VolumetricConstants) / sizeof(uint32_t), &constants);
 
-		computeContext.Dispatch(1920 / 32, 1080 / 32, 1);
+		computeContext.Dispatch(screenX / 32, screenY / 32, 1);
 		computeContext.Finish();
 	}
 }
