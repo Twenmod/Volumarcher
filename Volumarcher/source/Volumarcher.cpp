@@ -68,6 +68,11 @@ namespace Volumarcher
 
 		//End call
 		computeContext.Dispatch(screenX / 32, screenY / 32, 1);
+
+		//Put resource state back since MiniEngine does not check this
+		computeContext.TransitionResource(_outputBuffer,
+		                                  D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                  D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, false);
 		computeContext.Finish();
 	}
 }

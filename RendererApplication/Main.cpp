@@ -45,11 +45,17 @@ CREATE_APPLICATION(RendererApplication)
 
 void RendererApplication::Startup(void)
 {
-	Volume volumes[VOLUME_AMOUNT] = {{float3(0, 0, 5), 2.f, 2.f}};
+	Utility::Printf("Starting Volumarcher demo\n");
+
+	CpuTimer startupTimer;
+	startupTimer.Start();
+	Volume volumes[VOLUME_AMOUNT] = {{float3(0, 0, 5), 2.f, 10.f}};
 	m_volumetricContext = std::make_unique<Volumarcher::VolumetricContext>(volumes);
 	PostEffects::BloomEnable = false;
 	PostEffects::EnableHDR = false;
 	PostEffects::EnableAdaptation = false;
+	startupTimer.Stop();
+	Utility::Printf("Startup Time: %fs\n", startupTimer.GetTime());
 }
 
 void RendererApplication::Cleanup(void)
