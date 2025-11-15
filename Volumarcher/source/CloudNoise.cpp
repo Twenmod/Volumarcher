@@ -19,7 +19,7 @@ std::vector<float> CloudNoise::GenerateNoiseData(const glm::ivec3 _resolution)
 	int dataSize = _resolution.x * _resolution.y * _resolution.z;
 	data.resize(dataSize);
 	noise::module::Billow billowNoise;
-	billowNoise.SetFrequency(3.17);
+	billowNoise.SetFrequency(4.17);
 
 	for (int i = 0; i < dataSize; ++i)
 	{
