@@ -20,6 +20,11 @@ static const int AMBIENT_STEP_COUNT = 4; // Steps for getting summed ambient den
 static const float FAR_PLANE = 10;
 
 
+//TODO: Not hardcode this
+static const float3 SUN_DIR = normalize(float3(0.4, -1, 0.4));
+static const float3 SUN_LIGHT = float3(1, 0.95, 0.9);
+static const float ABSORPTION_SCATTERING = 1.0;
+
 
 static const float DEG_TO_RAD = 0.01745;
 
@@ -82,6 +87,31 @@ float GetSummedAmbientDensity(float3 _sample)
 }
 
 
+
+
+float3 GetDirectLighting(float3 _sample)
+{
+
+    float transmittance = 1.0;
+    float stepSize = FAR_PLANE / DIRECT_STEP_COUNT;
+    for (int i = 0; i < AMBIENT_STEP_COUNT; ++i)
+    {
+        float3 sample = _sample + -SUN_DIR * (i * stepSize);
+        for (int volumeId = 0; volumeId < VOLUME_AMOUNT; ++volumeId)
+        {
+            float3 sphereOffset = sample - volumes[volumeId].position;
+            float distToSphere2 = dot(sphereOffset, sphereOffset);
+            if (distToSphere2 < volumes[volumeId].squaredRad) // Hit sphere
+            {
+                float profile = SampleProfile(volumeId, sample, distToSphere2);
+                float density = SampleDensity(sample, profile);
+                transmittance = saturate(transmittance * exp(-stepSize * ABSORPTION_SCATTERING * density));
+            }
+        }
+    }
+    return SUN_LIGHT * transmittance;
+}
+
 [numthreads(32, 32, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
@@ -100,15 +130,13 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float3 rayOrigin = constants.camPos;
     float3 rayDir = mul(normalize(float3(rayX, rayY, 1)), camMat);
 
-    static const float3 CLOUD_COLOR = float3(1, 1, 1);
     static const float3 BACKGROUND_COLOR_UP = float3(0.667, 0.8, 0.886);
     static const float3 BACKGROUND_COLOR_DOWN = float3(0.2, 0.1, 0.07);
 
-    float3 background = lerp(BACKGROUND_COLOR_DOWN, BACKGROUND_COLOR_UP, saturate((rayDir.y*0.5) + 0.55));
+    float3 background = lerp(BACKGROUND_COLOR_DOWN, BACKGROUND_COLOR_UP, saturate((rayDir.y * 0.5) + 0.55));
 
     static const float3 AMBIENT_COLOR = float3(0.667, 0.8, 0.886);
 
-    static const float absorptionScattering = 1.0;
 
     float transmittance = 1.0;
 
@@ -119,6 +147,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
     for (int i = 0; i < STEP_COUNT; ++i)
     {
         float3 sample = rayOrigin + rayDir * (i * stepSize);
+
+        float density = 0;
+        float3 ambientLight = 0;
         for (int volumeId = 0; volumeId < VOLUME_AMOUNT; ++volumeId)
         {
             float3 sphereOffset = sample - volumes[volumeId].position;
@@ -126,15 +157,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
             if (distToSphere2 < volumes[volumeId].squaredRad) // Hit sphere
             {
                 float profile = SampleProfile(volumeId, sample, distToSphere2);
-                float density = SampleDensity(sample, profile);
+                density += SampleDensity(sample, profile);
 
-                float ambientScatter = saturate((1 - profile) * exp(-GetSummedAmbientDensity(sample))) * AMBIENT_COLOR;
-
-                light += transmittance * ambientScatter * density * stepSize;
-
-                transmittance = saturate(transmittance * exp(-stepSize * absorptionScattering * density));
+                ambientLight += saturate((1 - profile) * exp(-GetSummedAmbientDensity(sample))) * AMBIENT_COLOR;
             }
         }
+        float3 directLight = GetDirectLighting(sample);
+
+        light += (directLight + ambientLight) * transmittance * density * stepSize;
+
+        transmittance *= exp(-stepSize * ABSORPTION_SCATTERING * density);
     }
     light += transmittance * background;
 
