@@ -45,7 +45,8 @@ CREATE_APPLICATION(RendererApplication)
 
 void RendererApplication::Startup(void)
 {
-	m_volumetricContext = std::make_unique<Volumarcher::VolumetricContext>();
+	Volume volumes[VOLUME_AMOUNT] = {{float3(0, 0, 5), 2.f, 1.f}};
+	m_volumetricContext = std::make_unique<Volumarcher::VolumetricContext>(volumes);
 	PostEffects::BloomEnable = false;
 }
 
