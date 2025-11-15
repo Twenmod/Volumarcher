@@ -22,8 +22,15 @@ static const float FAR_PLANE = 10;
 
 //TODO: Not hardcode this
 static const float3 SUN_DIR = normalize(float3(0.4, -1, 0.4));
-static const float3 SUN_LIGHT = float3(1, 0.95, 0.9);
+static const float3 SUN_LIGHT = float3(1, 0.95, 0.9)*10;
+
+static const float3 BACKGROUND_COLOR_UP = float3(0.667, 0.8, 0.886);
+static const float3 BACKGROUND_COLOR_DOWN = float3(0.2, 0.1, 0.07);
+static const float3 AMBIENT_COLOR = float3(0.667, 0.8, 0.886);
+
+
 static const float ABSORPTION_SCATTERING = 1.0;
+static const float ECCENTRICITY = 0.2;
 
 
 static const float DEG_TO_RAD = 0.01745;
@@ -130,12 +137,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float3 rayOrigin = constants.camPos;
     float3 rayDir = mul(normalize(float3(rayX, rayY, 1)), camMat);
 
-    static const float3 BACKGROUND_COLOR_UP = float3(0.667, 0.8, 0.886);
-    static const float3 BACKGROUND_COLOR_DOWN = float3(0.2, 0.1, 0.07);
 
     float3 background = lerp(BACKGROUND_COLOR_DOWN, BACKGROUND_COLOR_UP, saturate((rayDir.y * 0.5) + 0.55));
 
-    static const float3 AMBIENT_COLOR = float3(0.667, 0.8, 0.886);
 
 
     float transmittance = 1.0;
@@ -159,10 +163,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 float profile = SampleProfile(volumeId, sample, distToSphere2);
                 density += SampleDensity(sample, profile);
 
-                ambientLight += saturate((1 - profile) * exp(-GetSummedAmbientDensity(sample))) * AMBIENT_COLOR;
+                ambientLight += saturate((1 - profile) * exp(-GetSummedAmbientDensity(sample))) * (AMBIENT_COLOR * PI);
             }
         }
-        float3 directLight = GetDirectLighting(sample);
+        float lightAngle = dot(rayDir, -SUN_DIR);
+        float3 directLight = GetDirectLighting(sample)*HenyeyGreensteinPhase(lightAngle,ECCENTRICITY);
 
         light += (directLight + ambientLight) * transmittance * density * stepSize;
 
