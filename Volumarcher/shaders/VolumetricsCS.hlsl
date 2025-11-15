@@ -47,11 +47,15 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float3 rayDir = mul(normalize(float3(rayX, rayY, 1)), camMat);
 
     static const float3 CLOUD_COLOR = float3(1, 1, 1);
-    static const float3 BACKGROUND_COLOR = float3(0, 0, 0);
+    static const float3 BACKGROUND_COLOR = float3(0.667, 0.8, 0.886);
+
+    static const float absorptionScattering = 1.0;
 
     float transmittance = 1.0;
 
     static float stepSize = FAR_PLANE / STEP_COUNT;
+    float3 light = BACKGROUND_COLOR;
+
     //Ray marching steps
     for (int i = 0; i < STEP_COUNT; ++i)
     {
@@ -68,12 +72,14 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 float noise = saturate(billowNoise.SampleLevel(noiseSampler, noiseTexSample, 0));
                 density = saturate(Remap(density, noise
                , 1, 0, 1));
-                transmittance -= density * stepSize;
+
+
+                transmittance *= exp(-stepSize * absorptionScattering * density);
             }
         }
     }
     transmittance = saturate(transmittance);
-    outputTexture[DTid.xy] = float4(lerp(CLOUD_COLOR, BACKGROUND_COLOR, transmittance), 1);
+    outputTexture[DTid.xy] = float4(light * transmittance, 1);
 
 
 }
