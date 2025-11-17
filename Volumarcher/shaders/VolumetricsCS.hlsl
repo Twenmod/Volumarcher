@@ -17,7 +17,7 @@ SamplerState noiseSampler : register(s0);
 static const int STEP_COUNT = 128; // Step count for main ray
 static const int DIRECT_STEP_COUNT = 16; // Steps for getting direct lighting
 static const int AMBIENT_STEP_COUNT = 4; // Steps for getting summed ambient density
-static const float FAR_PLANE = 5;
+static const float FAR_PLANE = 6;
 
 
 //TODO: Not hardcode this
