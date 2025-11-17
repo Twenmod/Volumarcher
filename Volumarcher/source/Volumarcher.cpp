@@ -74,7 +74,7 @@ namespace Volumarcher
 		computeContext.SetDynamicDescriptor(4, 0, m_noise.GetBillowNoise().GetSRV());
 
 		//End call
-		computeContext.Dispatch(screenX / 32, screenY / 32, 1);
+		computeContext.Dispatch(ceil(screenX / 32.f), ceil(screenY / 32.f), 1);
 
 		computeContext.TransitionResource(_outputBuffer, _outputBufferState, false);
 
