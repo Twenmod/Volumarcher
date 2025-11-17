@@ -186,7 +186,8 @@ void RendererApplication::Startup(void)
 	CpuTimer startupTimer;
 	startupTimer.Start();
 	Volume volumes[VOLUME_AMOUNT] = {{float3(0, 0, 2), 4.f, 5.f}};
-	m_volumetricContext = std::make_unique<Volumarcher::VolumetricContext>(volumes);
+	Volumarcher::CameraSettings cameraSettings{0.01f, 50.f, 70.f};
+	m_volumetricContext = std::make_unique<Volumarcher::VolumetricContext>(volumes, cameraSettings);
 	PostEffects::BloomEnable = false;
 	PostEffects::EnableHDR = false;
 	PostEffects::EnableAdaptation = false;
@@ -270,7 +271,6 @@ void RendererApplication::RenderRasterizerPass()
 void RendererApplication::RenderScene(void)
 {
 	RenderRasterizerPass();
-
 	m_volumetricContext->Render(g_SceneColorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, g_SceneDepthBuffer, m_camPos,
 	                            m_camRot);
 }

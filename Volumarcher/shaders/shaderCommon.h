@@ -12,6 +12,8 @@ struct VolumetricConstants
 	uint screenResX;
 	float3 camDir;
 	uint screenResY;
+	float zNear;
+	float zFar;
 };
 
 static const uint VOLUME_AMOUNT = 1;

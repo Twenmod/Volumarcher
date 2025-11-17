@@ -125,9 +125,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
 {
     float2 screenUV = (float2(DTid.xy)+0.5) / float2(constants.screenResX, constants.screenResY);
     float screenDepth = sceneDepth.SampleLevel(noiseSampler, screenUV, 0);
-    if (screenDepth > 0)
-        return;
+    float linearDepth = constants.zNear * constants.zFar / (constants.zFar + (1-screenDepth) * (constants.zNear - constants.zFar));
 
+    float farPlane = min(linearDepth, FAR_PLANE);
+	
 	//Get screen ray
     float aspect = float(constants.screenResX) / float(constants.screenResY);
 
@@ -144,11 +145,12 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
 
     float3 background = lerp(BACKGROUND_COLOR_DOWN, BACKGROUND_COLOR_UP, saturate((rayDir.y * 0.5) + 0.55));
-
+    if (screenDepth > 0)
+        background = outputTexture[DTid.xy];
 
     float transmittance = 1.0;
 
-    static float stepSize = FAR_PLANE / STEP_COUNT;
+    static float stepSize = farPlane / STEP_COUNT;
     float3 light = 0;
 
     //Ray marching steps
@@ -164,6 +166,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float distToSphere2 = dot(sphereOffset, sphereOffset);
             if (distToSphere2 < volumes[volumeId].squaredRad) // Hit sphere
             {
+
                 float profile = SampleProfile(volumeId, sample, distToSphere2);
                 density += SampleDensity(sample, profile);
 

@@ -13,12 +13,27 @@
 
 namespace Volumarcher
 {
+	struct CameraSettings
+	{
+		//zNear of _inputDepth
+		float zNear;
+		//zFar of _inputDepth
+		float zFar;
+		//Vertical Fov in degrees
+		float vFov; //TODO: Use
+	};
+
+	struct VolumetricSettings
+	{
+	};
+
 	class VolumetricContext
 	{
 	public:
 		VolumetricContext() = delete;
 
-		explicit VolumetricContext(Volume _volumes[VOLUME_AMOUNT]);
+		explicit VolumetricContext(Volume _volumes[VOLUME_AMOUNT], CameraSettings _cameraSettings,
+		                           VolumetricSettings _settings = {});
 
 		void SetVolumes(Volume _volumes[VOLUME_AMOUNT]);
 
@@ -33,5 +48,7 @@ namespace Volumarcher
 		ComputePSO m_computePSO;
 		RootSignature m_rs;
 		StructuredBuffer m_volumeBuffer;
+		CameraSettings m_cameraSettings;
+		VolumetricSettings m_volumetricSettings;
 	};
 }

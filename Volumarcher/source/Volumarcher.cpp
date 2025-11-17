@@ -9,9 +9,11 @@ namespace Volumarcher
 {
 #include "CompiledShaders/VolumetricsCS.h"
 
-
-	VolumetricContext::VolumetricContext(Volume _volumes[VOLUME_AMOUNT]) :
-		m_noise({256, 256, 256})
+	VolumetricContext::VolumetricContext(Volume _volumes[VOLUME_AMOUNT], CameraSettings _cameraSettings,
+	                                     VolumetricSettings _settings) :
+		m_noise({256, 256, 256}),
+		m_cameraSettings(_cameraSettings),
+		m_volumetricSettings(_settings)
 	{
 		m_rs.Reset(5, 1);
 		//Output texture
@@ -63,7 +65,7 @@ namespace Volumarcher
 		auto screenY = _outputBuffer.GetHeight();
 
 		glm::vec3 camDir = _camRot * glm::vec3(0, 0, 1);
-		VolumetricConstants constants{_camPos, screenX, camDir, screenY};
+		VolumetricConstants constants{_camPos, screenX, camDir, screenY, m_cameraSettings.zNear, m_cameraSettings.zFar};
 		computeContext.SetConstantArray(2, sizeof(VolumetricConstants) / sizeof(uint32_t), &constants);
 
 		//Bind volumes
