@@ -1,3 +1,5 @@
+
+
 #include "pch.h"
 #include "../MiniEngine/Core/GameCore.h"
 #include "../MiniEngine/Core/GraphicsCore.h"
@@ -12,6 +14,7 @@
 #include "../MiniEngine/Core/BufferManager.h"
 
 #include "Volumarcher.h"
+
 
 using namespace GameCore;
 using namespace Graphics;
@@ -57,31 +60,62 @@ private:
 struct Vertex
 {
 	float position[3];
+	float normal[3];
 };
 
 static const Vertex cubeVertices[] =
 {
-	// A very plain cube (positions)
-	{{-1, -1, -1}},
-	{{1, -1, -1}},
-	{{1, 1, -1}},
-	{{-1, 1, -1}},
+	// Front face (-Z)
+	{{-1, -1, -1}, {0, 0, -1}},
+	{{1, -1, -1}, {0, 0, -1}},
+	{{1, 1, -1}, {0, 0, -1}},
+	{{-1, 1, -1}, {0, 0, -1}},
 
-	{{-1, -1, 1}},
-	{{1, -1, 1}},
-	{{1, 1, 1}},
-	{{-1, 1, 1}}
+	// Back face (+Z)
+	{{-1, -1, 1}, {0, 0, 1}},
+	{{1, -1, 1}, {0, 0, 1}},
+	{{1, 1, 1}, {0, 0, 1}},
+	{{-1, 1, 1}, {0, 0, 1}},
+
+	// Left face (-X)
+	{{-1, -1, -1}, {-1, 0, 0}},
+	{{-1, 1, -1}, {-1, 0, 0}},
+	{{-1, 1, 1}, {-1, 0, 0}},
+	{{-1, -1, 1}, {-1, 0, 0}},
+
+	// Right face (+X)
+	{{1, -1, -1}, {1, 0, 0}},
+	{{1, 1, -1}, {1, 0, 0}},
+	{{1, 1, 1}, {1, 0, 0}},
+	{{1, -1, 1}, {1, 0, 0}},
+
+	// Top face (+Y)
+	{{-1, 1, -1}, {0, 1, 0}},
+	{{1, 1, -1}, {0, 1, 0}},
+	{{1, 1, 1}, {0, 1, 0}},
+	{{-1, 1, 1}, {0, 1, 0}},
+
+	// Bottom face (-Y)
+	{{-1, -1, -1}, {0, -1, 0}},
+	{{1, -1, -1}, {0, -1, 0}},
+	{{1, -1, 1}, {0, -1, 0}},
+	{{-1, -1, 1}, {0, -1, 0}},
 };
 
-// Index buffer (12 triangles)
 static const uint16_t cubeIndices[] =
 {
+	// Front face
 	0, 1, 2, 0, 2, 3,
+	// Back face
 	4, 5, 6, 4, 6, 7,
-	0, 4, 7, 0, 7, 3,
-	1, 5, 6, 1, 6, 2,
-	3, 2, 6, 3, 6, 7,
-	0, 1, 5, 0, 5, 4
+	// Left face
+	8, 9, 10, 8, 10, 11,
+	// Right face
+	12, 13, 14, 12, 14, 15,
+	// Top face
+	16, 17, 18, 16, 18, 19,
+	// Bottom face
+	20, 21, 22, 20, 22, 23
 };
 
 struct MatrixBuffer
@@ -101,6 +135,7 @@ void RendererApplication::InitRasterizor()
 	D3D12_INPUT_ELEMENT_DESC layout[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 
 	g_CubePSO.SetRootSignature(g_RootSig);
@@ -111,7 +146,7 @@ void RendererApplication::InitRasterizor()
 	});
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
 	depthStencilDesc.StencilEnable = false;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	D3D12_DEPTH_STENCILOP_DESC stencilDesc{};
@@ -143,6 +178,7 @@ CREATE_APPLICATION(RendererApplication)
 void RendererApplication::Startup(void)
 {
 	Utility::Printf("Starting Volumarcher demo\n");
+
 
 	InitRasterizor();
 
@@ -217,8 +253,8 @@ void RendererApplication::RenderRasterizerPass()
 	graphicsContext.SetIndexBuffer(ibv);
 
 	glm::vec3 camDir = m_camRot * glm::vec3(0, 0, 1);
-	glm::mat4 view = glm::lookAt(m_camPos, camDir, glm::vec3(0, 1, 0));
-	static const glm::mat4 projection = glm::perspective(glm::radians(70.f), (16.f / 9.f), 0.01f, 50.f);
+	glm::mat4 view = glm::lookAtRH(m_camPos, m_camPos + camDir, glm::vec3(0, 1, 0));
+	static const glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(70.f), (16.f / 9.f), 50.f, 0.01f);
 
 	MatrixBuffer constants{projection * view};
 	graphicsContext.SetConstantArray(0, sizeof(MatrixBuffer) / sizeof(uint32_t), &constants);
