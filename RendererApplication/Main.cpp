@@ -49,7 +49,7 @@ void RendererApplication::Startup(void)
 
 	CpuTimer startupTimer;
 	startupTimer.Start();
-	Volume volumes[VOLUME_AMOUNT] = {{float3(0, 0, 2), 2.f, 5.f}};
+	Volume volumes[VOLUME_AMOUNT] = {{float3(0, 0, 2), 4.f, 5.f}};
 	m_volumetricContext = std::make_unique<Volumarcher::VolumetricContext>(volumes);
 	PostEffects::BloomEnable = false;
 	PostEffects::EnableHDR = false;

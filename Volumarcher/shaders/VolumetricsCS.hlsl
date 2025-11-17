@@ -14,7 +14,7 @@ StructuredBuffer<Volume> volumes;
 Texture3D<float> billowNoise : register(t1);
 SamplerState noiseSampler : register(s0);
 
-static const int STEP_COUNT = 256; // Step count for main ray
+static const int STEP_COUNT = 128; // Step count for main ray
 static const int DIRECT_STEP_COUNT = 16; // Steps for getting direct lighting
 static const int AMBIENT_STEP_COUNT = 4; // Steps for getting summed ambient density
 static const float FAR_PLANE = 5;
@@ -22,7 +22,7 @@ static const float FAR_PLANE = 5;
 
 //TODO: Not hardcode this
 static const float3 SUN_DIR = normalize(float3(0.4, -1, 0.4));
-static const float3 SUN_LIGHT = float3(0.996, 0.969, 0.9) * 10;
+static const float3 SUN_LIGHT = float3(0.996, 0.9, 0.8) * 20;
 
 static const float3 BACKGROUND_COLOR_UP = float3(0.467, 0.529, 0.671);
 static const float3 BACKGROUND_COLOR_DOWN = float3(0.694, 0.596, 0.467)*0.5;
@@ -100,7 +100,7 @@ float3 GetDirectLighting(float3 _sample)
 {
 
     float transmittance = 1.0;
-    float stepSize = FAR_PLANE / DIRECT_STEP_COUNT;
+    float stepSize = FAR_PLANE*0.5 / DIRECT_STEP_COUNT;
     for (int i = 0; i < AMBIENT_STEP_COUNT; ++i)
     {
         float3 sample = _sample + -SUN_DIR * (i * stepSize);
@@ -139,7 +139,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
 
     float3 background = lerp(BACKGROUND_COLOR_DOWN, BACKGROUND_COLOR_UP, saturate((rayDir.y * 0.5) + 0.55));
-
 
 
     float transmittance = 1.0;
