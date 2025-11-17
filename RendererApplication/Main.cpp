@@ -271,5 +271,5 @@ void RendererApplication::RenderScene(void)
 {
 	RenderRasterizerPass();
 
-	//m_volumetricContext->Render(g_SceneColorBuffer, m_camPos, m_camRot);
+	m_volumetricContext->Render(g_SceneColorBuffer, g_SceneDepthBuffer, m_camPos, m_camRot);
 }

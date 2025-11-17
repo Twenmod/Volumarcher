@@ -3,15 +3,16 @@
 static const float PI = 3.14159;
 
 RWTexture2D<float4> outputTexture : register(u0);
+Texture2D<float> sceneDepth : register(t0);
 
 cbuffer RootConstants : register(b0)
 {
     VolumetricConstants constants;
 };
 
-StructuredBuffer<Volume> volumes;
+StructuredBuffer<Volume> volumes : register(t1);
 
-Texture3D<float> billowNoise : register(t1);
+Texture3D<float> billowNoise : register(t2);
 SamplerState noiseSampler : register(s0);
 
 static const int STEP_COUNT = 128; // Step count for main ray
@@ -122,10 +123,14 @@ float3 GetDirectLighting(float3 _sample)
 [numthreads(32, 32, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    //Get screen ray
+    float2 screenUV = DTid.xy / float2(constants.screenResX, constants.screenResY);
+    float screenDepth = sceneDepth.SampleLevel(noiseSampler, screenUV, 0);
+    if (screenDepth > 0)
+        return;
+
+	//Get screen ray
     float aspect = float(constants.screenResX) / float(constants.screenResY);
 
-    float2 screenUV = DTid.xy / float2(constants.screenResX, constants.screenResY);
     float fovAdjust = tan(vFov / 2);
     float rayX = (2 * screenUV.x - 1) * fovAdjust * aspect;
     float rayY = (1 - 2 * screenUV.y) * fovAdjust;

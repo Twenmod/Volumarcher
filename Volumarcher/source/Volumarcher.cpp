@@ -13,15 +13,17 @@ namespace Volumarcher
 	VolumetricContext::VolumetricContext(Volume _volumes[VOLUME_AMOUNT]) :
 		m_noise({256, 256, 256})
 	{
-		m_rs.Reset(4, 1);
+		m_rs.Reset(5, 1);
 		//Output texture
 		m_rs[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+		//Scene depth
+		m_rs[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1);
 		//Constants
-		m_rs[1].InitAsConstants(0, sizeof(VolumetricConstants) / sizeof(uint32_t));
+		m_rs[2].InitAsConstants(0, sizeof(VolumetricConstants) / sizeof(uint32_t));
 		//Volume buffer
-		m_rs[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1);
+		m_rs[3].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 		//Noise textures
-		m_rs[3].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, VOLUME_AMOUNT);
+		m_rs[4].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, VOLUME_AMOUNT);
 
 		//Linear wrap sampler
 		D3D12_SAMPLER_DESC noiseSamplerDesc{
@@ -45,7 +47,8 @@ namespace Volumarcher
 		m_volumeBuffer.Create(L"Volume buffer", VOLUME_AMOUNT, sizeof(Volume), &_volumes[0]);
 	}
 
-	void VolumetricContext::Render(ColorBuffer _outputBuffer, glm::vec3 _camPos, glm::quat _camRot)
+	void VolumetricContext::Render(ColorBuffer _outputBuffer, DepthBuffer _inputDepth, glm::vec3 _camPos,
+	                               glm::quat _camRot)
 	{
 		ComputeContext& computeContext = ComputeContext::Begin(L"Volumetric Pass");
 		computeContext.SetPipelineState(m_computePSO);
@@ -53,18 +56,19 @@ namespace Volumarcher
 		//Bind output
 		computeContext.TransitionResource(_outputBuffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, true);
 		computeContext.SetDynamicDescriptor(0, 0, _outputBuffer.GetUAV());
+		computeContext.SetDynamicDescriptor(1, 0, _inputDepth.GetDepthSRV());
 		//Bind variables
 		auto screenX = _outputBuffer.GetWidth();
 		auto screenY = _outputBuffer.GetHeight();
 
 		glm::vec3 camDir = _camRot * glm::vec3(0, 0, 1);
 		VolumetricConstants constants{_camPos, screenX, camDir, screenY};
-		computeContext.SetConstantArray(1, sizeof(VolumetricConstants) / sizeof(uint32_t), &constants);
+		computeContext.SetConstantArray(2, sizeof(VolumetricConstants) / sizeof(uint32_t), &constants);
 
 		//Bind volumes
-		computeContext.SetDynamicDescriptor(2, 0, m_volumeBuffer.GetSRV());
+		computeContext.SetDynamicDescriptor(3, 0, m_volumeBuffer.GetSRV());
 		//  Noise textures
-		computeContext.SetDynamicDescriptor(3, 0, m_noise.GetBillowNoise().GetSRV());
+		computeContext.SetDynamicDescriptor(4, 0, m_noise.GetBillowNoise().GetSRV());
 
 		//End call
 		computeContext.Dispatch(screenX / 32, screenY / 32, 1);

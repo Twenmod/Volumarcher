@@ -22,7 +22,7 @@ namespace Volumarcher
 
 		void SetVolumes(Volume _volumes[VOLUME_AMOUNT]);
 
-		void Render(ColorBuffer _outputBuffer, glm::vec3 _camPos = glm::vec3{0.f},
+		void Render(ColorBuffer _outputBuffer, DepthBuffer _inputDepth, glm::vec3 _camPos = glm::vec3{0.f},
 		            glm::quat _camRot = glm::identity<glm::quat>());
 
 	private:
