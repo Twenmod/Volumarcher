@@ -47,7 +47,8 @@ namespace Volumarcher
 		m_volumeBuffer.Create(L"Volume buffer", VOLUME_AMOUNT, sizeof(Volume), &_volumes[0]);
 	}
 
-	void VolumetricContext::Render(ColorBuffer _outputBuffer, DepthBuffer _inputDepth, glm::vec3 _camPos,
+	void VolumetricContext::Render(ColorBuffer _outputBuffer, D3D12_RESOURCE_STATES _outputBufferState,
+	                               DepthBuffer _inputDepth, glm::vec3 _camPos,
 	                               glm::quat _camRot)
 	{
 		ComputeContext& computeContext = ComputeContext::Begin(L"Volumetric Pass");
@@ -73,10 +74,9 @@ namespace Volumarcher
 		//End call
 		computeContext.Dispatch(screenX / 32, screenY / 32, 1);
 
-		//Put resource state back since MiniEngine does not check this
-		computeContext.TransitionResource(_outputBuffer,
-		                                  D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                  D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, false);
+		computeContext.TransitionResource(_outputBuffer, _outputBufferState, false);
+
+
 		computeContext.Finish();
 	}
 }

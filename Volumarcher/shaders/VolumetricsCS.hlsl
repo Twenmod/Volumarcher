@@ -123,7 +123,7 @@ float3 GetDirectLighting(float3 _sample)
 [numthreads(32, 32, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    float2 screenUV = DTid.xy / float2(constants.screenResX, constants.screenResY);
+    float2 screenUV = (float2(DTid.xy)+0.5) / float2(constants.screenResX, constants.screenResY);
     float screenDepth = sceneDepth.SampleLevel(noiseSampler, screenUV, 0);
     if (screenDepth > 0)
         return;

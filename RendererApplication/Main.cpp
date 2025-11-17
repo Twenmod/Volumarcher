@@ -141,12 +141,12 @@ void RendererApplication::InitRasterizor()
 	g_CubePSO.SetRootSignature(g_RootSig);
 	g_CubePSO.SetInputLayout(_countof(layout), layout);
 	g_CubePSO.SetRasterizerState({
-		D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_NONE, true, 0, 0, 0, true, false, false, 0,
-		D3D12_CONSERVATIVE_RASTERIZATION_MODE_ON
+		D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_NONE, true, -1, -1.f, 0, true, false, false, 0,
+		D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF
 	});
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
 	depthStencilDesc.StencilEnable = false;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	D3D12_DEPTH_STENCILOP_DESC stencilDesc{};
@@ -271,5 +271,6 @@ void RendererApplication::RenderScene(void)
 {
 	RenderRasterizerPass();
 
-	m_volumetricContext->Render(g_SceneColorBuffer, g_SceneDepthBuffer, m_camPos, m_camRot);
+	m_volumetricContext->Render(g_SceneColorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, g_SceneDepthBuffer, m_camPos,
+	                            m_camRot);
 }
