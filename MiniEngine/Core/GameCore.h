@@ -18,7 +18,7 @@
 namespace GameCore
 {
     extern bool gIsSupending;
-
+    extern bool g_mouseLocked;
     class IGameApp
     {
     public:

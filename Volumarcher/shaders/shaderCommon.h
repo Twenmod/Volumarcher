@@ -15,7 +15,7 @@ struct VolumetricConstants
 	float zNear;
 	float zFar;
 };
-
+ 
 static const uint VOLUME_AMOUNT = 1;
 
 struct Volume

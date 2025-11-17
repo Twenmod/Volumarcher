@@ -1,5 +1,6 @@
 
 
+#include "Display.h"
 #include "pch.h"
 #include "../MiniEngine/Core/GameCore.h"
 #include "../MiniEngine/Core/GraphicsCore.h"
@@ -45,6 +46,7 @@ private:
 	float m_camPitch{0.f};
 	const float m_cameraSpeed{2.f};
 	const float m_cameraRotSpeed{0.7f};
+
 
 	//Cube/Rasterizor stuff
 	StructuredBuffer vertexBuffer;
@@ -179,7 +181,6 @@ void RendererApplication::Startup(void)
 {
 	Utility::Printf("Starting Volumarcher demo\n");
 
-
 	InitRasterizor();
 
 	Utility::Printf("Creating Volumetric Context\n");
@@ -205,12 +206,20 @@ void RendererApplication::Update(const float _deltaTime)
 {
 	ScopedTimer _prof(L"Update State");
 
+	if (GameInput::IsFirstPressed(GameInput::DigitalInput::kKey_tab))
+	{
+		GameCore::g_mouseLocked = !GameCore::g_mouseLocked;
+		static int cursorPos[2]{0, 0};
+	}
+	if (GameCore::g_mouseLocked)
+	{
+		//Rotation
+		m_camYaw -= GameInput::GetAnalogInput(GameInput::kAnalogMouseX) * m_cameraRotSpeed;
+		m_camPitch -= GameInput::GetAnalogInput(GameInput::kAnalogMouseY) * m_cameraRotSpeed;
+		m_camPitch = glm::clamp(m_camPitch, -89.99f, 89.99f);
+		m_camRot = glm::angleAxis(m_camYaw, glm::vec3(0, 1, 0)) * glm::angleAxis(m_camPitch, glm::vec3(1, 0, 0));
+	}
 
-	//Rotation
-	m_camYaw -= GameInput::GetAnalogInput(GameInput::kAnalogMouseX) * m_cameraRotSpeed;
-	m_camPitch -= GameInput::GetAnalogInput(GameInput::kAnalogMouseY) * m_cameraRotSpeed;
-	m_camPitch = glm::clamp(m_camPitch, -89.99f, 89.99f);
-	m_camRot = glm::angleAxis(m_camYaw, glm::vec3(0, 1, 0)) * glm::angleAxis(m_camPitch, glm::vec3(1, 0, 0));
 
 	//Movement
 	glm::vec3 input{0.f};

@@ -30,6 +30,7 @@ namespace GameCore
 	using namespace Graphics;
 
 	bool gIsSupending = false;
+	bool g_mouseLocked{true};
 
 	void InitializeApplication(IGameApp& game)
 	{

@@ -19,6 +19,7 @@ namespace GameInput
     void Shutdown();
     void Update( float frameDelta );
 
+
     enum DigitalInput
     {
         // keyboard

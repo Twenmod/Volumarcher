@@ -13,8 +13,8 @@
 
 #include "pch.h"
 #include "GameCore.h"
-#include "GameInput.h"
 
+#include "GameInput.h"
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #define USE_XINPUT
@@ -31,6 +31,8 @@ namespace GameCore
 {
     extern HWND g_hWnd;
 }
+
+
 
 #else
 
