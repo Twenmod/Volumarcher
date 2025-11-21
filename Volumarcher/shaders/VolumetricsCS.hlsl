@@ -23,10 +23,10 @@ static const float FAR_PLANE = 6;
 
 //TODO: Not hardcode this
 static const float3 SUN_DIR = normalize(float3(0.4, -1, 0.4));
-static const float3 SUN_LIGHT = float3(0.996, 0.9, 0.8) * 20;
+static const float3 SUN_LIGHT = float3(0.996, 0.9, 0.8) * 10;
 
 static const float3 BACKGROUND_COLOR_UP = float3(0.467, 0.529, 0.671);
-static const float3 BACKGROUND_COLOR_DOWN = float3(0.694, 0.596, 0.467)*0.5;
+static const float3 BACKGROUND_COLOR_DOWN = float3(0.694, 0.596, 0.467) * 0.5;
 static const float3 AMBIENT_COLOR = float3(0.467, 0.529, 0.671);
 
 
@@ -53,11 +53,11 @@ float HenyeyGreensteinPhase(float inCosAngle, float inG)
     return num * rsqrt_denom * rsqrt_denom * rsqrt_denom * (1.0 / (4.0 * PI));
 }
 
-//Sample dimensional profile (base density)
+//Sample dimensional profile
 float SampleProfile(int _volumeId, float3 _sample, float _distToVolume2 /*TODO shaped: Remove after implementing*/)
 {
 	//Sphere
-    float profile = volumes[_volumeId].baseDensity * (1 - _distToVolume2 / sqrt(volumes[_volumeId].squaredRad));
+    float profile = (1 - _distToVolume2 / sqrt(volumes[_volumeId].squaredRad));
     return profile;
 }
 
@@ -87,7 +87,7 @@ float GetSummedAmbientDensity(float3 _sample)
             float distToSphere2 = dot(sphereOffset, sphereOffset);
             if (distToSphere2 < volumes[volumeId].squaredRad) // Hit sphere
             {
-                density += SampleDensity(sample, SampleProfile(volumeId, sample, distToSphere2));
+                density += SampleDensity(sample, SampleProfile(volumeId, sample, distToSphere2) * volumes[volumeId].baseDensity)*stepSize;
             }
         }
     }
@@ -96,12 +96,11 @@ float GetSummedAmbientDensity(float3 _sample)
 
 
 
-
-float3 GetDirectLighting(float3 _sample)
+float GetDirectLightDensitySamples(float3 _sample)
 {
 
-    float transmittance = 1.0;
-    float stepSize = FAR_PLANE*0.5 / DIRECT_STEP_COUNT;
+    float totalDensity = 0;
+    float stepSize = FAR_PLANE * 0.5 / DIRECT_STEP_COUNT;
     for (int i = 0; i < AMBIENT_STEP_COUNT; ++i)
     {
         float3 sample = _sample + -SUN_DIR * (i * stepSize);
@@ -112,13 +111,19 @@ float3 GetDirectLighting(float3 _sample)
             if (distToSphere2 < volumes[volumeId].squaredRad) // Hit sphere
             {
                 float profile = SampleProfile(volumeId, sample, distToSphere2);
-                float density = SampleDensity(sample, profile);
-                transmittance = saturate(transmittance * exp(-stepSize * ABSORPTION_SCATTERING * density));
+                totalDensity = SampleDensity(sample, profile)*stepSize;
             }
         }
     }
-    return SUN_LIGHT * transmittance;
+    return totalDensity;
 }
+
+float InScatteringApprox(float _baseDimensionalProfile, float _sun_dot, float _sunDensitySamples)
+{
+    return exp(-_sunDensitySamples * Remap(_sun_dot, 0.0, 0.9, 0.25, Remap(_baseDimensionalProfile, 1.0, 0.0, 0.05, 0.25)));
+}
+
+
 
 [numthreads(32, 32, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -126,9 +131,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
     if (DTid.x > constants.screenResX || DTid.y > constants.screenResY)
         return;
 
-    float2 screenUV = (float2(DTid.xy)+0.5) / float2(constants.screenResX, constants.screenResY);
+    float2 screenUV = (float2(DTid.xy) + 0.5) / float2(constants.screenResX, constants.screenResY);
     float screenDepth = sceneDepth.SampleLevel(noiseSampler, screenUV, 0);
-    float linearDepth = constants.zNear * constants.zFar / (constants.zFar + (1-screenDepth) * (constants.zNear - constants.zFar));
+    float linearDepth = constants.zNear * constants.zFar / (constants.zFar + (1 - screenDepth) * (constants.zNear - constants.zFar));
 
     float farPlane = min(linearDepth, FAR_PLANE);
 	
@@ -162,7 +167,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float3 sample = rayOrigin + rayDir * (i * stepSize);
 
         float density = 0;
-        float3 ambientLight = 0;
+        float3 sampleLight = 0;
         for (int volumeId = 0; volumeId < VOLUME_AMOUNT; ++volumeId)
         {
             float3 sphereOffset = sample - volumes[volumeId].position;
@@ -170,16 +175,20 @@ void main(uint3 DTid : SV_DispatchThreadID)
             if (distToSphere2 < volumes[volumeId].squaredRad) // Hit sphere
             {
 
-                float profile = SampleProfile(volumeId, sample, distToSphere2);
+                float baseProfile = SampleProfile(volumeId, sample, distToSphere2);
+                float profile = volumes[volumeId].baseDensity * baseProfile;
                 density += SampleDensity(sample, profile);
 
-                ambientLight += saturate((1 - profile) * exp(-GetSummedAmbientDensity(sample))) * (AMBIENT_COLOR * PI);
+                sampleLight += saturate((1 - profile) * exp(-GetSummedAmbientDensity(sample))) * (AMBIENT_COLOR * PI);
+                float lightAngle = dot(rayDir, -SUN_DIR);
+                float inSunLightDensitySamples = GetDirectLightDensitySamples(sample);
+                float lightVolume = InScatteringApprox(baseProfile, lightAngle, inSunLightDensitySamples);
+                sampleLight += lightVolume *SUN_LIGHT* HenyeyGreensteinPhase(lightAngle, ECCENTRICITY);
+
+
             }
         }
-        float lightAngle = dot(rayDir, -SUN_DIR);
-        float3 directLight = GetDirectLighting(sample)*HenyeyGreensteinPhase(lightAngle,ECCENTRICITY);
-
-        light += (directLight + ambientLight) * transmittance * density * stepSize;
+        light += (sampleLight) * transmittance * density * stepSize;
 
         transmittance *= exp(-stepSize * ABSORPTION_SCATTERING * density);
     }
